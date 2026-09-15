@@ -1,0 +1,42 @@
+{
+  "data_classification": "DEMO / SYNTHETIC DATA",
+  "metadata": {
+    "dataset_name": "Sample River Runoff and Sluice Gauge Telemetry",
+    "source": "Synthetic Hydrology Sensor Network",
+    "source_type": "HYDROLOGICAL_GAUGE",
+    "source_status": "DEMO",
+    "collection_date": "2026-09-15",
+    "last_updated": "2026-09-15 09:00",
+    "geographic_scope": "Cauvery Delta Estuary",
+    "resolution": "Point Observation",
+    "confidence": 94
+  },
+  "records": [
+    {
+      "gauge_id": "RG-KAD-01",
+      "location_name": "North Creek Estuary Gauge",
+      "habitation_id": "kadalpuram",
+      "latitude": 10.772,
+      "longitude": 79.840,
+      "current_level_m": 3.8,
+      "warning_level_m": 3.0,
+      "danger_level_m": 4.2,
+      "trend": "RISING",
+      "discharge_cusecs": 12500,
+      "status": "WARNING"
+    },
+    {
+      "gauge_id": "RG-THJ-02",
+      "location_name": "Vennar Sluice Regulator",
+      "habitation_id": "aarupadi",
+      "latitude": 10.787,
+      "longitude": 79.138,
+      "current_level_m": 4.5,
+      "warning_level_m": 4.0,
+      "danger_level_m": 5.0,
+      "trend": "STABLE",
+      "discharge_cusecs": 18200,
+      "status": "WARNING"
+    }
+  ]
+}

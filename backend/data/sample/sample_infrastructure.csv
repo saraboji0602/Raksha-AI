@@ -1,0 +1,6 @@
+infra_id,name,category,settlement_id,latitude,longitude,capacity,elevation_m,status,source_status
+INF-SH-01,Velankanni Multi-Hazard Relief Camp,SHELTER,kadalpuram,10.7712,79.8320,850,8.5,OPERATIONAL,DEMO
+INF-HC-01,Kadalpuram Primary Health Subcentre,HEALTHCARE,kadalpuram,10.7645,79.8410,50,3.2,FLOOD_PRONE,DEMO
+INF-RD-01,Coastal Causeway Route A,ROAD,kadalpuram,10.7680,79.8430,0,1.4,BLOCKED,DEMO
+INF-RD-02,SH-49 Elevated High Bypass,ROAD,kadalpuram,10.7620,79.8300,0,6.5,CLEAR,DEMO
+INF-SH-02,Ooty High School Shelter Bay,SHELTER,malaiyur,11.4120,76.6980,450,1450.0,OPERATIONAL,DEMO

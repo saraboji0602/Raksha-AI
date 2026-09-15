@@ -1,0 +1,63 @@
+{
+  "type": "FeatureCollection",
+  "data_classification": "DEMO / SYNTHETIC DATA",
+  "metadata": {
+    "dataset_name": "Sample Fluvial Flood Inundation Zones",
+    "source": "Synthetic Hydrodynamic Model DEM-10m",
+    "source_type": "HYDROLOGY",
+    "source_status": "DEMO",
+    "collection_date": "2026-09-01",
+    "last_updated": "2026-09-15",
+    "geographic_scope": "Nagapattinam & Delta Basin",
+    "resolution": "10m Grid",
+    "confidence": 92
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "FL-001",
+        "hazard_type": "flood",
+        "severity": "CRITICAL",
+        "water_depth_m": 2.4,
+        "return_period_yrs": 50,
+        "habitation_id": "kadalpuram"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [79.835, 10.760],
+            [79.845, 10.760],
+            [79.848, 10.775],
+            [79.838, 10.775],
+            [79.835, 10.760]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_id": "FL-002",
+        "hazard_type": "flood",
+        "severity": "HIGH",
+        "water_depth_m": 1.5,
+        "return_period_yrs": 25,
+        "habitation_id": "aarupadi"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [79.130, 10.780],
+            [79.145, 10.780],
+            [79.142, 10.795],
+            [79.128, 10.795],
+            [79.130, 10.780]
+          ]
+        ]
+      }
+    }
+  ]
+}

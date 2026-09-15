@@ -55,14 +55,14 @@ export const FieldOfficerApp: React.FC = () => {
 
   const handleSimulateGPS = () => {
     setGpsCoords({
-      lat: currentSettlement.latitude + (Math.random() - 0.5) * 0.002,
-      lng: currentSettlement.longitude + (Math.random() - 0.5) * 0.002,
+      lat: currentSettlement.latitude + 0.0012,
+      lng: currentSettlement.longitude + 0.0008,
       accuracy: 1.8
     });
     addToast({
       type: 'info',
       title: 'GPS High-Precision Lock Achieved',
-      description: `Coordinates locked: ${gpsCoords.lat.toFixed(4)}° N, ${gpsCoords.lng.toFixed(4)}° E (±1.8m accuracy)`
+      description: `Coordinates locked: ${(currentSettlement.latitude + 0.0012).toFixed(4)}° N, ${(currentSettlement.longitude + 0.0008).toFixed(4)}° E (±1.8m accuracy)`
     });
   };
 

@@ -1,0 +1,46 @@
+{
+  "data_classification": "DEMO / SYNTHETIC DATA",
+  "metadata": {
+    "dataset_name": "Sample Candidate Resettlement Safe Havens",
+    "source": "State Land Bank & Cadastral Registry (Synthetic)",
+    "source_type": "LAND_CADASTRE",
+    "source_status": "DEMO",
+    "collection_date": "2026-09-01",
+    "last_updated": "2026-09-15",
+    "geographic_scope": "Nagapattinam & Nilgiris Regions",
+    "resolution": "Parcel Cadastre",
+    "confidence": 95
+  },
+  "sites": [
+    {
+      "site_id": "site-b",
+      "name": "Pothigai Hills Greenfield Haven (Site B)",
+      "district": "Nagapattinam District (Inland)",
+      "latitude": 10.8420,
+      "longitude": 79.7610,
+      "land_area_acres": 28.5,
+      "elevation_meters": 18.5,
+      "distance_from_coast_km": 14.5,
+      "hazard_safety_score": 98,
+      "capacity_max": 5000,
+      "allocated_population": 2650,
+      "land_tenure": "Government Wasteland (Gramanatham Classification)",
+      "status": "APPROVED_FOR_PLANNING"
+    },
+    {
+      "site_id": "site-c",
+      "name": "Bedrock Ridge Plateau (Site C)",
+      "district": "Nilgiri Foothills Haven",
+      "latitude": 11.3850,
+      "longitude": 76.7420,
+      "land_area_acres": 35.0,
+      "elevation_meters": 1420.0,
+      "distance_from_coast_km": 95.0,
+      "hazard_safety_score": 96,
+      "capacity_max": 3500,
+      "allocated_population": 2140,
+      "land_tenure": "Revenue Forest Buffer Zone",
+      "status": "FIELD_ASSESSED"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: raksha-postgis-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: raksha_db
+      POSTGRES_USER: raksha_user
+      POSTGRES_PASSWORD: raksha_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U raksha_user -d raksha_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: raksha-backend-api
+    restart: unless-stopped
+    environment:
+      PROJECT_NAME: "RAKSHA-AI Decision Intelligence Platform"
+      ENVIRONMENT: "production"
+      DATABASE_URL: "postgresql://raksha_user:raksha_password@db:5432/raksha_db"
+      CORS_ORIGINS: "http://localhost:5173,http://localhost:3000,https://raksha-ai.vercel.app"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgis_data:

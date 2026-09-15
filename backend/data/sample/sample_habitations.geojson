@@ -1,0 +1,53 @@
+{
+  "type": "FeatureCollection",
+  "data_classification": "DEMO / SYNTHETIC DATA",
+  "metadata": {
+    "dataset_name": "Sample Vulnerable Coastal & Hill Habitations",
+    "source": "Synthetic Micro-Habitation Demographics Survey",
+    "source_type": "SOCIO_DEMOGRAPHIC",
+    "source_status": "DEMO",
+    "collection_date": "2026-09-01",
+    "last_updated": "2026-09-15",
+    "geographic_scope": "Tamil Nadu Coastal & Hill Districts",
+    "resolution": "Habitation Level",
+    "confidence": 93
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "habitation_id": "kadalpuram",
+        "name": "Kadalpuram",
+        "district": "Nagapattinam Coastal Zone",
+        "population": 4820,
+        "households": 912,
+        "dominant_hazard": "coastal_erosion",
+        "overall_risk": 72,
+        "ai_recommendation": "PARTIAL_RELOCATION",
+        "relocation_population": 2650
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [79.8428, 10.7654]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "habitation_id": "malaiyur",
+        "name": "Malaiyur",
+        "district": "Nilgiri Hills Demonstration District",
+        "population": 2140,
+        "households": 440,
+        "dominant_hazard": "landslide",
+        "overall_risk": 94,
+        "ai_recommendation": "FULL_RELOCATION",
+        "relocation_population": 2140
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [76.6950, 11.4102]
+      }
+    }
+  ]
+}

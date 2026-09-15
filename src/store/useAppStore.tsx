@@ -351,7 +351,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isTourActive, setIsTourActive] = useState<boolean>(false);
 
   const addToast = (toast: Omit<ToastMessage, 'id'>) => {
-    const id = 'toast-' + Math.random().toString(36).substring(2, 9);
+    const id = 'toast-' + Date.now().toString(36) + '-' + toasts.length;
     setToasts(prev => [...prev, { ...toast, id }]);
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
@@ -875,7 +875,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addAuditLogEntry = (entry: Omit<AuditLogEntry, 'id' | 'timestamp'>) => {
     const newEntry: AuditLogEntry = {
       ...entry,
-      id: 'aud-' + Math.random().toString(36).substring(2, 9),
+      id: 'aud-' + Date.now().toString(36) + '-' + auditLogs.length,
       timestamp: 'Just now'
     };
     setAuditLogs(prev => [newEntry, ...prev]);
@@ -1111,7 +1111,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const calculatedPriority = Math.round((severityFactor * 0.35) + (popFactor * 0.40) + (80 * 0.25));
 
     const newItem: RecoveryItem = {
-      id: 'rec-cit-' + Math.random().toString(36).substring(2, 7),
+      id: 'rec-cit-' + Date.now().toString(36) + '-' + recoveryItems.length,
       settlementId: claim.settlementId,
       settlementName: settlements.find(s => s.id === claim.settlementId)?.name || 'Kadalpuram',
       microZoneId: 'kz-1',
