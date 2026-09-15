@@ -6,6 +6,7 @@ import { PrioritySettlementsList } from '../components/dashboard/PrioritySettlem
 import { RiskTrendChart } from '../components/dashboard/RiskTrendChart';
 import { InterventionDistribution } from '../components/dashboard/InterventionDistribution';
 import { ActionCenterCard } from '../components/dashboard/ActionCenterCard';
+import { WhatChangedPanel } from '../components/common/WhatChangedPanel';
 import { Sparkles, ArrowRight, ShieldCheck, Database, Layers } from 'lucide-react';
 
 export const OverviewPage: React.FC = () => {
@@ -28,7 +29,7 @@ export const OverviewPage: React.FC = () => {
             National Settlement Risk & Intelligent Relocation Overview
           </h1>
           <p className="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
-            Monitor multi-hazard exposures, evaluate Protect vs Adapt vs Relocate interventions, and discover validated inland safe havens.
+            From Hazard Detection to Safe Relocation Decisions • Understand the risk, prioritize the people, find the safer option, act with evidence.
           </p>
         </div>
 
@@ -40,7 +41,7 @@ export const OverviewPage: React.FC = () => {
             addToast({
               type: 'info',
               title: 'Flagship Digital Twin Loaded: Kadalpuram',
-              description: 'Examine 91/100 risk decomposition and micro-zone analysis.'
+              description: 'Examine 72 ⇄ 91 risk decomposition and micro-zone analysis.'
             });
           }}
           className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/20 transition-all self-end md:self-center flex-shrink-0 active:scale-95"
@@ -53,6 +54,9 @@ export const OverviewPage: React.FC = () => {
 
       {/* Top Executive KPI Metric Cards */}
       <OverviewKPIs />
+
+      {/* "What Changed?" Intelligence Panel */}
+      <WhatChangedPanel />
 
       {/* GIS Command Center Map View */}
       <div className="space-y-2">
@@ -92,3 +96,4 @@ export const OverviewPage: React.FC = () => {
     </div>
   );
 };
+

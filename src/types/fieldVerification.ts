@@ -1,5 +1,44 @@
 export type VerificationStatus = 'PENDING' | 'IN_PROGRESS' | 'CONFIRMED' | 'MODIFIED' | 'REJECTED' | 'FLAGGED';
 
+export type FieldTaskType = 
+  | 'ROAD_PASSABILITY' 
+  | 'WATER_LEVEL_GAUGE' 
+  | 'SHELTER_INSPECTION' 
+  | 'EROSION_SCARP' 
+  | 'STRUCTURAL_DAMAGE';
+
+export type FieldTaskStatus = 
+  | 'ASSIGNED' 
+  | 'EN_ROUTE' 
+  | 'ON_SITE' 
+  | 'VERIFIED' 
+  | 'CONFLICT_DETECTED' 
+  | 'COMPLETED';
+
+export interface FieldTaskItem {
+  id: string;
+  incidentId?: string;
+  settlementId: string;
+  settlementName: string;
+  microZoneId: string;
+  microZoneName: string;
+  title: string;
+  taskType: FieldTaskType;
+  priority: 'IMMEDIATE' | 'HIGH' | 'MEDIUM';
+  status: FieldTaskStatus;
+  expectedAiCondition: string;
+  actualGroundObservation?: string;
+  aiConfidence: number; // e.g. 82%
+  fieldConfidence?: number; // e.g. 96%
+  officerNotes?: string;
+  hasConflict?: boolean;
+  conflictId?: string;
+  geotaggedPhotos: string[];
+  assignedOfficerName: string;
+  assignedOfficerBadge: string;
+  timestamp: string;
+}
+
 export interface FieldChecklistItem {
   id: string;
   category: 'HAZARD' | 'INFRASTRUCTURE' | 'VULNERABILITY' | 'RELOCATION';

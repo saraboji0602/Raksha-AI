@@ -3,12 +3,14 @@ import { useApp } from '../../store/useAppStore';
 import { RiskBreakdownCard } from './RiskBreakdownCard';
 import { ExplainableFactors } from './ExplainableFactors';
 import { MicroZoneAnalysis } from './MicroZoneAnalysis';
+import { WhoNeedsActionView } from './WhoNeedsActionView';
 import { ExposureAnalysis } from './ExposureAnalysis';
 import { VulnerabilityRadar } from './VulnerabilityRadar';
 import { ResilienceBreakdown } from './ResilienceBreakdown';
 import { EvacuationRoutesView } from './EvacuationRoutesView';
 import { HistoricalDisasterTimeline } from './HistoricalDisasterTimeline';
 import { GISMapView } from '../map/GISMapView';
+import { WhatChangedPanel } from '../common/WhatChangedPanel';
 import { Badge } from '../common/Badge';
 import { 
   Building2, 
@@ -19,7 +21,9 @@ import {
   CheckSquare2, 
   ArrowRight, 
   FileSpreadsheet,
-  Network
+  Network,
+  RefreshCw,
+  AlertTriangle
 } from 'lucide-react';
 
 export const SettlementDigitalTwin: React.FC = () => {
@@ -28,10 +32,13 @@ export const SettlementDigitalTwin: React.FC = () => {
     setCurrentPage, 
     setSelectedSafeSiteId,
     setIsDecisionTraceOpen,
+    kadalpuramSimulationMode,
+    toggleRisingRiverSimulation,
     addToast 
   } = useApp();
   
   const settlement = getSelectedSettlement();
+  const isKadalpuram = settlement.id === 'kadalpuram';
 
   return (
     <div className="space-y-6">
@@ -51,14 +58,25 @@ export const SettlementDigitalTwin: React.FC = () => {
                 ID: {settlement.id.toUpperCase()}
               </span>
               <Badge variant="risk" level={settlement.overallRisk >= 85 ? 'CRITICAL' : 'HIGH'} size="sm" />
-              {settlement.id === 'kadalpuram' && (
+              {isKadalpuram && (
                 <span className="text-[10px] font-mono font-bold bg-purple-950 text-purple-300 px-2 py-0.5 rounded border border-purple-800">
                   ★ FLAGSHIP DEMO
                 </span>
               )}
+              {settlement.compoundHazard && settlement.compoundHazard.type !== 'NONE' && (
+                <span className="text-[10px] font-mono font-bold bg-red-950 text-red-300 px-2 py-0.5 rounded border border-red-800 flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3 text-red-400" />
+                  COMPOUND HAZARD (1.32x)
+                </span>
+              )}
             </div>
 
-            <h1 className="text-2xl font-black text-white tracking-tight mt-1">{settlement.name}</h1>
+            <h1 className="text-2xl font-black text-white tracking-tight mt-1 flex items-center gap-2.5">
+              <span>{settlement.name}</span>
+              <span className="text-base font-mono font-normal text-slate-400">
+                (Risk: <strong className={settlement.overallRisk >= 85 ? 'text-red-400 font-bold' : 'text-amber-400 font-bold'}>{settlement.overallRisk}/100</strong>)
+              </span>
+            </h1>
             <p className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
               <MapPin className="w-3.5 h-3.5 text-cyan-400" />
               <span>{settlement.district}, {settlement.state} • Area: {settlement.areaSqKm} sq km • Pop: {settlement.population.toLocaleString()} ({settlement.households} households)</span>
@@ -67,7 +85,24 @@ export const SettlementDigitalTwin: React.FC = () => {
         </div>
 
         {/* Top Quick Actions */}
-        <div className="flex items-center gap-2.5 self-end md:self-center flex-shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 self-end md:self-center flex-shrink-0">
+          {isKadalpuram && (
+            <button
+              onClick={toggleRisingRiverSimulation}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-md ${
+                kadalpuramSimulationMode === 'RISING_RIVER_SURGE'
+                  ? 'bg-red-600 hover:bg-red-500 text-white border-red-400'
+                  : 'bg-slate-800 hover:bg-slate-700 text-cyan-300 border-cyan-500/40'
+              }`}
+              title="Simulate river level rise from baseline 72 to critical 91"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>
+                {kadalpuramSimulationMode === 'RISING_RIVER_SURGE' ? 'Surge Mode (91) Active' : 'Simulate River Surge (72 → 91)'}
+              </span>
+            </button>
+          )}
+
           <button
             onClick={() => setIsDecisionTraceOpen(true)}
             className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-cyan-300 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-colors"
@@ -94,6 +129,11 @@ export const SettlementDigitalTwin: React.FC = () => {
         </div>
       </div>
 
+      {/* "What Changed?" Intelligence Panel for Kadalpuram */}
+      {isKadalpuram && (
+        <WhatChangedPanel />
+      )}
+
       {/* Row 1: GIS Map & Multi-Hazard Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         <div className="lg:col-span-7">
@@ -103,6 +143,9 @@ export const SettlementDigitalTwin: React.FC = () => {
           <RiskBreakdownCard settlement={settlement} />
         </div>
       </div>
+
+      {/* Who Needs Action? View */}
+      <WhoNeedsActionView settlement={settlement} />
 
       {/* Row 2: Explainable AI & Micro-Zone Disaggregation */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -136,7 +179,7 @@ export const SettlementDigitalTwin: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentPage('safe-sites')}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors"
+            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors"
           >
             Find Safe Havens
           </button>

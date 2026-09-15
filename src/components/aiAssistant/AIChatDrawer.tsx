@@ -10,23 +10,50 @@ import {
   HelpCircle, 
   Maximize2, 
   Minimize2,
-  Trash2
+  Trash2,
+  ShieldCheck,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowRight,
+  Database,
+  Cpu,
+  UserCheck
 } from 'lucide-react';
 
 export const AIChatDrawer: React.FC = () => {
-  const { isAIChatOpen, setIsAIChatOpen, chatMessages, sendUserChatMessage } = useApp();
+  const { 
+    isAIChatOpen, 
+    setIsAIChatOpen, 
+    chatMessages, 
+    sendUserChatMessage,
+    activeViewMode,
+    setCurrentPage,
+    t 
+  } = useApp();
+
   const [inputText, setInputText] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const quickPrompts = [
+  const officerPrompts = [
+    'Which habitation needs action first?',
     'Why is Kadalpuram high risk?',
-    'Why is Site B preferred over Site A?',
-    'Which settlements need immediate relocation?',
-    'What happens if we adapt instead?',
-    'What is the cost of inaction?',
-    'Explain Malaiyur landslide risk'
+    'Why is Site B recommended?',
+    'What did field officers verify?',
+    'What is the 10-year cost of inaction?',
+    'What long-term prevention is needed?'
   ];
+
+  const citizenPrompts = [
+    'What is my current risk?',
+    'Why is my area red?',
+    'Where is the nearest safe shelter?',
+    'Which evacuation route should I take?',
+    'Why did my route change to Route B?',
+    'What immediate actions should I take?'
+  ];
+
+  const quickPrompts = activeViewMode === 'CITIZEN' ? citizenPrompts : officerPrompts;
 
   useEffect(() => {
     if (isAIChatOpen) {
@@ -45,24 +72,24 @@ export const AIChatDrawer: React.FC = () => {
 
   return (
     <div
-      className={`fixed bottom-4 right-4 z-50 bg-slate-900 border border-cyan-500/50 rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 animate-slideUp ${
-        isExpanded ? 'w-[90vw] md:w-[650px] h-[80vh]' : 'w-[90vw] sm:w-[400px] h-[520px]'
+      className={`fixed bottom-4 right-4 z-50 bg-slate-900 border border-cyan-500/50 rounded-3xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 animate-slideUp ${
+        isExpanded ? 'w-[92vw] md:w-[700px] h-[85vh]' : 'w-[92vw] sm:w-[440px] h-[580px]'
       }`}
     >
       {/* Header */}
-      <div className="p-3.5 bg-gradient-to-r from-slate-900 via-slate-850 to-cyan-950 border-b border-slate-800 flex items-center justify-between">
+      <div className="p-4 bg-gradient-to-r from-slate-900 via-slate-850 to-cyan-950 border-b border-slate-800 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-slate-950 shadow-md shadow-cyan-500/25">
-            <Bot className="w-4 h-4 stroke-[2.5]" />
+            <Bot className="w-5 h-5 stroke-[2.5]" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-bold text-white tracking-tight">RAKSHA Assistant</span>
-              <span className="text-[9px] font-mono font-bold bg-cyan-950 text-cyan-400 px-1.5 py-0.2 rounded border border-cyan-700/60 uppercase">
-                AI ENGINE
+              <span className="text-sm font-bold text-white tracking-tight">RAKSHA Context AI Assistant</span>
+              <span className="text-[9px] font-mono font-bold bg-cyan-950 text-cyan-400 px-1.5 py-0.5 rounded border border-cyan-700/60 uppercase">
+                {activeViewMode} MODE
               </span>
             </div>
-            <p className="text-[10px] text-slate-400">Disaster Decision Intelligence & Explainability</p>
+            <p className="text-[10px] text-slate-400">Explainable Disaster Decision Intelligence</p>
           </div>
         </div>
 
@@ -85,8 +112,8 @@ export const AIChatDrawer: React.FC = () => {
       </div>
 
       {/* Quick Prompt Chips */}
-      <div className="p-2 bg-slate-950/80 border-b border-slate-800 overflow-x-auto flex items-center gap-1.5 no-scrollbar">
-        <span className="text-[10px] text-slate-500 font-semibold uppercase whitespace-nowrap pl-1">
+      <div className="p-2 bg-slate-950/90 border-b border-slate-800 overflow-x-auto flex items-center gap-1.5 no-scrollbar">
+        <span className="text-[9px] font-mono text-cyan-400 font-bold uppercase whitespace-nowrap pl-1">
           SUGGESTIONS:
         </span>
         {quickPrompts.map((prompt, idx) => (
@@ -100,60 +127,106 @@ export const AIChatDrawer: React.FC = () => {
         ))}
       </div>
 
-      {/* Chat Messages */}
-      <div className="flex-1 p-3.5 overflow-y-auto space-y-3 bg-slate-950/50 text-xs">
+      {/* Chat Messages Log */}
+      <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-950/50">
         {chatMessages.map(msg => {
           const isUser = msg.sender === 'user';
           return (
             <div
               key={msg.id}
-              className={`flex items-start gap-2.5 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
+              className={`flex gap-3 text-xs leading-relaxed animate-in fade-in duration-150 ${
+                isUser ? 'justify-end' : 'justify-start'
+              }`}
             >
-              <div
-                className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-                  isUser
-                    ? 'bg-cyan-600 text-slate-950'
-                    : 'bg-slate-800 text-cyan-400 border border-cyan-500/30'
-                }`}
-              >
-                {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-              </div>
+              {!isUser && (
+                <div className="w-7 h-7 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Bot className="w-4 h-4" />
+                </div>
+              )}
 
               <div
-                className={`max-w-[82%] p-3 rounded-xl border leading-relaxed ${
+                className={`max-w-[85%] rounded-2xl p-3.5 space-y-2.5 ${
                   isUser
-                    ? 'bg-cyan-950/80 text-cyan-100 border-cyan-700/50 rounded-tr-none'
-                    : 'bg-slate-900/90 text-slate-200 border-slate-800 rounded-tl-none'
+                    ? 'bg-cyan-600 text-slate-950 font-medium rounded-tr-sm shadow-md'
+                    : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-tl-sm shadow-xl'
                 }`}
               >
-                <div className="whitespace-pre-line">{msg.text}</div>
-                <div
-                  className={`mt-1 text-[9px] font-mono ${
-                    isUser ? 'text-cyan-300/70 text-right' : 'text-slate-500'
-                  }`}
-                >
+                {/* Text with markdown lines */}
+                <div className="whitespace-pre-line text-xs">
+                  {msg.text}
+                </div>
+
+                {/* 4-Dimensional AI Transparency Block */}
+                {!isUser && msg.metadata && (
+                  <div className="pt-2.5 border-t border-slate-800/80 space-y-2 text-[11px]">
+                    
+                    {/* Why Evidence */}
+                    <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300">
+                      <strong className="text-cyan-400 flex items-center gap-1 mb-0.5">
+                        <Sparkles className="w-3 h-3 text-cyan-400" /> WHY? (Physical Evidence):
+                      </strong>
+                      <span>{msg.metadata.whyExplanation}</span>
+                    </div>
+
+                    {/* Metadata Chips Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      <div className="p-1.5 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 flex items-center justify-between text-[10px] font-mono">
+                        <span>Confidence:</span>
+                        <strong>{msg.metadata.confidenceScore}% (Calibrated)</strong>
+                      </div>
+
+                      <div className="p-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 text-[10px] truncate">
+                        <span className="text-slate-400">Source: </span>
+                        <span>{msg.metadata.dataSourceProvenance}</span>
+                      </div>
+                    </div>
+
+                    {/* Human Authority Status */}
+                    <div className="p-1.5 rounded-lg bg-indigo-950/30 border border-indigo-500/30 text-indigo-300 flex items-center justify-between text-[10px]">
+                      <span className="flex items-center gap-1">
+                        <UserCheck className="w-3 h-3 text-indigo-400" /> Authority Review:
+                      </span>
+                      <strong className="truncate max-w-[180px]">{msg.metadata.humanReviewStatus}</strong>
+                    </div>
+
+                    {msg.metadata.suggestedAction && (
+                      <div className="text-[10px] text-amber-300 flex items-center gap-1 mt-1 font-semibold">
+                        <ArrowRight className="w-3 h-3 text-amber-400 flex-shrink-0" />
+                        <span>Action: {msg.metadata.suggestedAction}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className={`text-[9px] font-mono ${isUser ? 'text-cyan-950/70' : 'text-slate-500'} text-right`}>
                   {msg.timestamp}
                 </div>
               </div>
+
+              {isUser && (
+                <div className="w-7 h-7 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <User className="w-4 h-4" />
+                </div>
+              )}
             </div>
           );
         })}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Box */}
-      <form onSubmit={handleSend} className="p-3 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
+      {/* Input Bar */}
+      <form onSubmit={handleSend} className="p-3 bg-slate-950 border-t border-slate-800 flex items-center gap-2">
         <input
           type="text"
-          placeholder="Ask RAKSHA Assistant about settlements, risk, or sites..."
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          className="flex-1 bg-slate-950 border border-slate-700 focus:border-cyan-500 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none transition-all shadow-inner"
+          placeholder={activeViewMode === 'CITIZEN' ? "Ask about your risk, shelters, or routes..." : "Ask RAKSHA AI about habitations, site suitability, data conflicts..."}
+          className="flex-1 bg-slate-900 border border-slate-700 focus:border-cyan-500 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-500 outline-none transition-colors"
         />
         <button
           type="submit"
-          disabled={inputText.trim() === ''}
-          className="p-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-40 disabled:hover:bg-cyan-500 text-slate-950 font-bold transition-all shadow-md shadow-cyan-500/20"
+          className="p-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-all active:scale-95 flex-shrink-0 font-bold"
+          title="Send query"
         >
           <Send className="w-4 h-4" />
         </button>

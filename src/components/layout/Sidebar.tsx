@@ -17,12 +17,29 @@ import {
   MessageSquareCode,
   Network,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Radio,
+  Hammer,
+  Scale
 } from 'lucide-react';
 
 interface SidebarProps {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
+}
+
+interface NavItem {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  count?: number;
+  highlight?: boolean;
+  badge?: string;
+}
+
+interface NavGroup {
+  title: string;
+  items: NavItem[];
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
@@ -31,6 +48,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
     setCurrentPage,
     t,
     alerts,
+    incidents,
+    dataConflicts,
     isAIChatOpen,
     setIsAIChatOpen,
     setIsDecisionTraceOpen,
@@ -38,21 +57,52 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
   } = useApp();
 
   const unreadAlerts = alerts.filter(a => !a.read).length;
+  const activeSOSCount = incidents.filter(i => i.status !== 'RESOLVED').length;
+  const activeConflictsCount = dataConflicts.filter(c => c.status === 'CONFLICT_DETECTED').length;
 
-  const navItems = [
-    { id: 'dashboard', label: t('navOverview'), icon: LayoutDashboard },
-    { id: 'risk', label: t('navRiskMap'), icon: Map, badge: 'GIS' },
-    { id: 'settlements', label: t('navSettlements'), icon: Building2 },
-    { id: 'intervention', label: t('navIntervention'), icon: GitBranch, highlight: true },
-    { id: 'safe-sites', label: t('navSafeSites'), icon: ShieldCheck },
-    { id: 'relocation', label: t('navRelocationPlanner'), icon: Compass },
-    { id: 'simulator', label: t('navSimulator'), icon: Sliders, highlight: true },
-    { id: 'field-verification', label: t('navFieldVerification'), icon: CheckSquare2 },
-    { id: 'reports', label: t('navReports'), icon: FileSpreadsheet },
-    { id: 'alerts', label: t('navAlerts'), icon: AlertTriangle, count: unreadAlerts },
-    { id: 'data', label: t('navDataSources'), icon: Database },
-    { id: 'settings', label: t('navSettings'), icon: Settings },
-    { id: 'help', label: t('navHelp'), icon: HelpCircle }
+  const navGroups: NavGroup[] = [
+    {
+      title: t('navGroupMonitor'),
+      items: [
+        { id: 'dashboard', label: t('navOverview'), icon: LayoutDashboard },
+        { id: 'emergency-center', label: t('navEmergencyCenter'), icon: Radio, count: activeSOSCount, highlight: true },
+        { id: 'risk', label: t('navRiskMap'), icon: Map, badge: 'GIS' },
+        { id: 'settlements', label: t('navSettlements'), icon: Building2 },
+        { id: 'alerts', label: t('navAlerts'), icon: AlertTriangle, count: unreadAlerts }
+      ]
+    },
+    {
+      title: t('navGroupAct'),
+      items: [
+        { id: 'field-verification', label: t('navFieldVerification'), icon: CheckSquare2, count: activeConflictsCount > 0 ? activeConflictsCount : undefined, highlight: true },
+        { id: 'recovery', label: t('navRecovery'), icon: Hammer, highlight: true }
+      ]
+    },
+    {
+      title: t('navGroupPlan'),
+      items: [
+        { id: 'prevention', label: t('navPrevention'), icon: ShieldCheck, highlight: true, badge: 'AI' },
+        { id: 'intervention', label: t('navIntervention'), icon: GitBranch },
+        { id: 'safe-sites', label: t('navSafeSites'), icon: ShieldCheck },
+        { id: 'relocation', label: t('navRelocationPlanner'), icon: Compass },
+        { id: 'simulator', label: t('navSimulator'), icon: Sliders, highlight: true }
+      ]
+    },
+    {
+      title: t('navGroupVerify'),
+      items: [
+        { id: 'audit', label: t('navAudit'), icon: Scale },
+        { id: 'data', label: t('navDataSources'), icon: Database }
+      ]
+    },
+    {
+      title: t('navGroupInsight'),
+      items: [
+        { id: 'reports', label: t('navReports'), icon: FileSpreadsheet },
+        { id: 'settings', label: t('navSettings'), icon: Settings },
+        { id: 'help', label: t('navHelp'), icon: HelpCircle }
+      ]
+    }
   ];
 
   return (
@@ -62,8 +112,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
       }`}
     >
       {/* Top Header / Collapser */}
-      <div className="flex flex-col">
-        <div className="p-3 flex items-center justify-between border-b border-slate-800">
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <div className="p-3 flex items-center justify-between border-b border-slate-800 flex-shrink-0">
           {!collapsed && (
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-mono font-bold tracking-widest text-cyan-400 uppercase">
@@ -80,53 +130,62 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
           </button>
         </div>
 
-        {/* Navigation links */}
-        <nav className="p-2 space-y-1 overflow-y-auto max-h-[calc(100vh-250px)]">
-          {navItems.map(item => {
-            const Icon = item.icon;
-            const isActive = currentPage === item.id || (item.id === 'settlements' && currentPage === 'settlement-detail');
+        {/* Navigation links with grouped sections */}
+        <nav className="p-2 space-y-3 overflow-y-auto flex-1 custom-scrollbar">
+          {navGroups.map((grp, gIdx) => (
+            <div key={gIdx} className="space-y-1">
+              {!collapsed && (
+                <div className="px-3 pt-1 text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
+                  {grp.title}
+                </div>
+              )}
+              {grp.items.map(item => {
+                const Icon = item.icon;
+                const isActive = currentPage === item.id || (item.id === 'settlements' && currentPage === 'settlement-detail');
 
-            return (
-              <button
-                key={item.id}
-                onClick={() => setCurrentPage(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all group ${
-                  isActive
-                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-sm shadow-cyan-950/40'
-                    : 'hover:bg-slate-800/80 text-slate-300 hover:text-white border border-transparent'
-                } ${item.highlight && !isActive ? 'hover:border-cyan-500/20' : ''}`}
-                title={collapsed ? item.label : undefined}
-              >
-                <Icon
-                  className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                    isActive
-                      ? 'text-cyan-400'
-                      : item.highlight
-                      ? 'text-cyan-400 group-hover:text-cyan-300'
-                      : 'text-slate-400 group-hover:text-slate-200'
-                  }`}
-                />
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setCurrentPage(item.id)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all group ${
+                      isActive
+                        ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-sm shadow-cyan-950/40'
+                        : 'hover:bg-slate-800/80 text-slate-300 hover:text-white border border-transparent'
+                    } ${item.highlight && !isActive ? 'hover:border-cyan-500/20' : ''}`}
+                    title={collapsed ? item.label : undefined}
+                  >
+                    <Icon
+                      className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                        isActive
+                          ? 'text-cyan-400'
+                          : item.highlight
+                          ? 'text-cyan-400 group-hover:text-cyan-300'
+                          : 'text-slate-400 group-hover:text-slate-200'
+                      }`}
+                    />
 
-                {!collapsed && (
-                  <div className="flex items-center justify-between flex-1">
-                    <span className="truncate">{item.label}</span>
+                    {!collapsed && (
+                      <div className="flex items-center justify-between flex-1">
+                        <span className="truncate">{item.label}</span>
 
-                    {item.badge && (
-                      <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">
-                        {item.badge}
-                      </span>
+                        {item.badge && (
+                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">
+                            {item.badge}
+                          </span>
+                        )}
+
+                        {item.count !== undefined && item.count > 0 && (
+                          <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-red-600 text-white">
+                            {item.count}
+                          </span>
+                        )}
+                      </div>
                     )}
-
-                    {item.count !== undefined && item.count > 0 && (
-                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-red-600 text-white">
-                        {item.count}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </button>
-            );
-          })}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </nav>
       </div>
 

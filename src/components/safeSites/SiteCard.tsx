@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SafeSite, Settlement } from '../../types';
 import { useApp } from '../../store/useAppStore';
 import { Badge } from '../common/Badge';
@@ -15,7 +15,11 @@ import {
   AlertTriangle, 
   Sparkles,
   ArrowRight,
-  ExternalLink
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
+  FileCheck,
+  Calendar
 } from 'lucide-react';
 
 export const SiteCard: React.FC<{
@@ -25,10 +29,53 @@ export const SiteCard: React.FC<{
   onSelect?: () => void;
 }> = ({ site, settlement, isSelected = false, onSelect }) => {
   const { setCurrentPage, setSelectedSafeSiteId } = useApp();
+  const [showDetails, setShowDetails] = useState(false);
+
   const distKm = settlement ? site.distanceFromKeySettlementKm[settlement.id] || 18.4 : 18.4;
   const travelMin = settlement ? site.travelTimeMin[settlement.id] || 32 : 32;
-
   const isRecommendedForCurrent = settlement?.recommendedSiteId === site.id || site.id === 'site-b';
+
+  const getLandVerificationBadge = (status?: string) => {
+    switch (status) {
+      case 'POTENTIALLY_SUITABLE':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-700/60">
+            <FileCheck className="w-3 h-3 text-emerald-400" />
+            POTENTIALLY SUITABLE
+          </span>
+        );
+      case 'NEEDS_LAND_VERIFICATION':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950/80 text-amber-300 border border-amber-700/60">
+            <AlertTriangle className="w-3 h-3 text-amber-400" />
+            NEEDS LAND VERIFICATION
+          </span>
+        );
+      case 'OWNERSHIP_VERIFICATION_REQUIRED':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-orange-950/80 text-orange-300 border border-orange-700/60">
+            <AlertTriangle className="w-3 h-3 text-orange-400" />
+            OWNERSHIP VERIFICATION REQ.
+          </span>
+        );
+      case 'ADMINISTRATIVE_REVIEW_REQUIRED':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-950/80 text-blue-300 border border-blue-700/60">
+            <FileCheck className="w-3 h-3 text-blue-400" />
+            ADMINISTRATIVE REVIEW REQ.
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700">
+            <FileCheck className="w-3 h-3 text-slate-400" />
+            GOVERNMENT PARCEL
+          </span>
+        );
+    }
+  };
+
+  const headroom = site.capacity.remainingCapacity ?? (site.capacity.recommendedMaxCapacity - (site.allocatedPopulation || 0));
 
   return (
     <div
@@ -42,14 +89,15 @@ export const SiteCard: React.FC<{
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-3 pb-3 border-b border-slate-800">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
                 {site.code}
               </span>
+              {getLandVerificationBadge(site.landVerificationStatus)}
               {isRecommendedForCurrent && (
-                <span className="text-[10px] font-mono font-black bg-gradient-to-r from-purple-600 to-cyan-600 text-slate-950 px-2 py-0.5 rounded-full uppercase flex items-center gap-1 shadow-sm">
+                <span className="text-[10px] font-mono font-black bg-gradient-to-r from-purple-500 to-cyan-500 text-slate-950 px-2.5 py-0.5 rounded-full uppercase flex items-center gap-1 shadow-sm">
                   <Sparkles className="w-3 h-3 fill-slate-950" />
-                  <span>AI RECOMMENDED</span>
+                  <span>AI RECOMMENDED #1</span>
                 </span>
               )}
             </div>
@@ -61,26 +109,41 @@ export const SiteCard: React.FC<{
             </p>
           </div>
 
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            <span className="font-mono font-black text-lg text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-xl border border-emerald-800/80 shadow-inner">
-              {site.overallScore} / 100
-            </span>
+          <div className="flex flex-col sm:items-end gap-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-slate-400 font-medium">Composite Score</span>
+              <span className="font-mono font-black text-lg text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-xl border border-emerald-800/80 shadow-inner">
+                {site.overallScore} / 100
+              </span>
+            </div>
+            {site.climateHorizonYears && (
+              <span className="text-[10px] font-mono text-cyan-300/80 flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3 text-cyan-400" />
+                {site.climateHorizonYears}-Year Zero-Flood Buffer
+              </span>
+            )}
           </div>
         </div>
 
         {/* Distance & Travel Badge */}
-        <div className="flex flex-wrap items-center gap-3 p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 text-xs mb-4">
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <Route className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Distance from target: <strong className="text-white font-mono">{distKm} km</strong></span>
+        <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 text-xs mb-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-1.5 text-slate-300">
+              <Route className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Distance: <strong className="text-white font-mono">{distKm} km</strong></span>
+            </div>
+            <span className="text-slate-600">|</span>
+            <div className="flex items-center gap-1.5 text-slate-300">
+              <Clock className="w-3.5 h-3.5 text-amber-400" />
+              <span>Transit: <strong className="text-white font-mono">{travelMin} mins</strong></span>
+            </div>
+            <span className="text-slate-600">|</span>
+            <span className="text-slate-300 font-medium">Road: <strong className="text-emerald-400">{site.roadQuality.replace(/_/g, ' ')}</strong></span>
           </div>
-          <span className="text-slate-600">|</span>
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <Clock className="w-3.5 h-3.5 text-amber-400" />
-            <span>Transit Time: <strong className="text-white font-mono">{travelMin} mins</strong></span>
+
+          <div className="text-[11px] font-mono px-2 py-0.5 bg-cyan-950/60 border border-cyan-800/50 rounded text-cyan-300">
+            Headroom: <strong className="text-white font-bold">+{headroom.toLocaleString()}</strong>
           </div>
-          <span className="text-slate-600">|</span>
-          <span className="text-slate-300 font-medium">Road: <strong className="text-emerald-400">{site.roadQuality.replace('_', ' ')}</strong></span>
         </div>
 
         {/* 4 Pillars Gauges */}
@@ -88,7 +151,50 @@ export const SiteCard: React.FC<{
           <ScoreGauge score={site.hazardSafetyScore} label="Hazard Safety" variant="safety" size="sm" />
           <ScoreGauge score={site.connectivityScore} label="Road Access" variant="safety" size="sm" />
           <ScoreGauge score={site.waterScore} label="Water Grid" variant="safety" size="sm" />
-          <ScoreGauge score={site.communityAcceptance.overallScore} label="Community Acceptance" variant="acceptance" size="sm" />
+          <ScoreGauge score={site.communityAcceptance.overallScore} label="Community Preference" variant="acceptance" size="sm" />
+        </div>
+
+        {/* Why this site rationale box */}
+        <div className="p-3 rounded-xl bg-purple-950/20 border border-purple-800/40 mb-3 space-y-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-1.5 text-purple-300 font-bold">
+              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+              <span>EXPLAINABLE SELECTION RATIONALE</span>
+            </div>
+            <button
+              onClick={() => setShowDetails(!showDetails)}
+              className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-0.5 underline font-medium"
+            >
+              <span>{showDetails ? 'Hide analysis' : 'View full breakdown'}</span>
+              {showDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            </button>
+          </div>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            {site.selectionRationale}
+          </p>
+
+          {showDetails && (
+            <div className="pt-2 mt-2 border-t border-purple-800/30 text-xs space-y-2">
+              <div className="text-[11px] text-slate-400">
+                <span className="font-bold text-slate-300">Current Land Status: </span>
+                {site.currentLandUse}
+              </div>
+              <div className="text-[11px] text-slate-400">
+                <span className="font-bold text-slate-300">Bottleneck Constraint: </span>
+                {site.capacity.bottleneckResource}
+              </div>
+              {site.communityAcceptance.primaryConcerns.length > 0 && (
+                <div className="text-[11px]">
+                  <span className="font-bold text-amber-300">Key Community Conditions: </span>
+                  <ul className="list-disc list-inside text-slate-400 pl-1 mt-0.5 space-y-0.5">
+                    {site.communityAcceptance.primaryConcerns.map((c, i) => (
+                      <li key={i}>{c}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Carrying Capacity Component */}
@@ -140,3 +246,4 @@ export const SiteCard: React.FC<{
     </div>
   );
 };
+

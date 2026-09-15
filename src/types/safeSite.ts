@@ -5,6 +5,12 @@ export type SiteValidationStatus =
   | 'COMMUNITY_CONSULTED' 
   | 'APPROVED_FOR_PLANNING';
 
+export type LandVerificationStatus = 
+  | 'POTENTIALLY_SUITABLE' 
+  | 'NEEDS_LAND_VERIFICATION' 
+  | 'OWNERSHIP_VERIFICATION_REQUIRED' 
+  | 'ADMINISTRATIVE_REVIEW_REQUIRED';
+
 export interface CarryingCapacityBreakdown {
   physicalLandCapacity: number; // Max population based on sq m/person
   waterSupportedCapacity: number;
@@ -13,7 +19,10 @@ export interface CarryingCapacityBreakdown {
   educationCapacity: number;
   roadNetworkCapacity: number;
   recommendedMaxCapacity: number; // Constrained by bottleneck
+  currentOccupancy?: number;
+  remainingCapacity?: number;
   bottleneckResource: string;
+  isOverCapacity?: boolean;
 }
 
 export interface InfrastructureGap {
@@ -22,6 +31,7 @@ export interface InfrastructureGap {
   available: string;
   gapStatus: 'SATISFIED' | 'MODERATE_GAP' | 'CRITICAL_GAP';
   estimatedCostCr: number;
+  hasDataGap?: boolean;
 }
 
 export interface CommunityAcceptanceMetrics {
@@ -51,6 +61,7 @@ export interface SafeSite {
   
   // Status & Scores
   status: SiteValidationStatus;
+  landVerificationStatus?: LandVerificationStatus;
   overallScore: number; // 0 - 100
   hazardSafetyScore: number; // 0 - 100
   landAvailabilityScore: number;
@@ -59,6 +70,11 @@ export interface SafeSite {
   healthcareScore: number;
   educationScore: number;
   livelihoodScore: number;
+  administrativeFeasibilityScore?: number;
+  
+  // Climate Horizon
+  climateHorizonYears?: number; // e.g. 50 years zero-flood envelope
+  seaLevelRiseBufferMeters?: number;
   
   // Carrying Capacity
   capacity: CarryingCapacityBreakdown;
@@ -81,6 +97,10 @@ export interface SafeSite {
   ecologicalSensitivity: 'LOW' | 'MODERATE' | 'HIGH';
   environmentalClearanceRisk: 'MINIMAL' | 'REQUIRES_CRZ_CLEARANCE' | 'STANDARD_PERMITS';
   
+  // Data Gap Tracking
+  dataConfidenceScore?: number;
+  hasUnverifiedLandStatus?: boolean;
+  
   description: string;
   selectionRationale: string;
 }
@@ -97,4 +117,6 @@ export interface SiteMatchResult {
   travelTimeMin: number;
   isRecommended: boolean;
   recommendationReason: string;
+  carryingCapacityHeadroom?: number;
+  whyRecommendedPoints?: string[];
 }

@@ -235,6 +235,19 @@ export const ProtectAdaptRelocateCards: React.FC<{ settlement: Settlement }> = (
           </button>
         </div>
       </div>
+
+      {/* Human Authority Disclaimer Box */}
+      <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+          <span>
+            <strong className="text-white">Human Authority Principle:</strong> AI recommends evidence-backed intervention pathways. Official sanction requires authorized District Collector & SDMA executive approval.
+          </span>
+        </div>
+        <span className="font-mono text-cyan-400 font-bold text-[11px] whitespace-nowrap">
+          "AI recommends. Human authority decides."
+        </span>
+      </div>
     </div>
   );
 };

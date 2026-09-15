@@ -16,6 +16,7 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
     slopePercentage: 1.8,
     
     status: 'COMMUNITY_CONSULTED',
+    landVerificationStatus: 'POTENTIALLY_SUITABLE',
     overallScore: 91,
     hazardSafetyScore: 92,
     landAvailabilityScore: 95,
@@ -24,6 +25,10 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
     healthcareScore: 86,
     educationScore: 82,
     livelihoodScore: 86,
+    administrativeFeasibilityScore: 92,
+    climateHorizonYears: 50,
+    seaLevelRiseBufferMeters: 14.5,
+    dataConfidenceScore: 94,
     
     capacity: {
       physicalLandCapacity: 6200,
@@ -33,6 +38,8 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
       educationCapacity: 5200,
       roadNetworkCapacity: 5800,
       recommendedMaxCapacity: 5000,
+      currentOccupancy: 0,
+      remainingCapacity: 2350,
       bottleneckResource: 'Infrastructure (Water grid feeder extension required for >5,000)'
     },
     allocatedPopulation: 2650,
@@ -136,6 +143,7 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
     slopePercentage: 3.5,
     
     status: 'FIELD_ASSESSED',
+    landVerificationStatus: 'NEEDS_LAND_VERIFICATION',
     overallScore: 79,
     hazardSafetyScore: 94,
     landAvailabilityScore: 78,
@@ -144,6 +152,11 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
     healthcareScore: 74,
     educationScore: 70,
     livelihoodScore: 52,
+    administrativeFeasibilityScore: 75,
+    climateHorizonYears: 50,
+    seaLevelRiseBufferMeters: 18.2,
+    dataConfidenceScore: 78,
+    hasUnverifiedLandStatus: true,
     
     capacity: {
       physicalLandCapacity: 3800,
@@ -153,6 +166,8 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
       educationCapacity: 3500,
       roadNetworkCapacity: 4100,
       recommendedMaxCapacity: 3200,
+      currentOccupancy: 0,
+      remainingCapacity: 3200,
       bottleneckResource: 'Groundwater table depth (deep hard rock)'
     },
     allocatedPopulation: 0,
@@ -178,7 +193,8 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
         required: 'Deep intake water reservoir',
         available: 'No local perennial source',
         gapStatus: 'CRITICAL_GAP',
-        estimatedCostCr: 4.8
+        estimatedCostCr: 4.8,
+        hasDataGap: true
       }
     ],
     
@@ -217,6 +233,7 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
     slopePercentage: 4.2,
     
     status: 'INFRASTRUCTURE_VALIDATED',
+    landVerificationStatus: 'OWNERSHIP_VERIFICATION_REQUIRED',
     overallScore: 80,
     hazardSafetyScore: 96,
     landAvailabilityScore: 82,
@@ -225,6 +242,10 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
     healthcareScore: 78,
     educationScore: 74,
     livelihoodScore: 74,
+    administrativeFeasibilityScore: 84,
+    climateHorizonYears: 50,
+    seaLevelRiseBufferMeters: 890.0,
+    dataConfidenceScore: 91,
     
     capacity: {
       physicalLandCapacity: 2700,
@@ -234,6 +255,8 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
       educationCapacity: 2700,
       roadNetworkCapacity: 2600,
       recommendedMaxCapacity: 2600,
+      currentOccupancy: 0,
+      remainingCapacity: 460,
       bottleneckResource: 'Road network capacity along foothill link'
     },
     allocatedPopulation: 2140,
@@ -295,6 +318,7 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
     slopePercentage: 1.1,
     
     status: 'APPROVED_FOR_PLANNING',
+    landVerificationStatus: 'ADMINISTRATIVE_REVIEW_REQUIRED',
     overallScore: 87,
     hazardSafetyScore: 86,
     landAvailabilityScore: 98,
@@ -303,6 +327,10 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
     healthcareScore: 82,
     educationScore: 85,
     livelihoodScore: 90,
+    administrativeFeasibilityScore: 88,
+    climateHorizonYears: 50,
+    seaLevelRiseBufferMeters: 42.0,
+    dataConfidenceScore: 96,
     
     capacity: {
       physicalLandCapacity: 6100,
@@ -312,6 +340,8 @@ export const INITIAL_SAFE_SITES: SafeSite[] = [
       educationCapacity: 6000,
       roadNetworkCapacity: 6200,
       recommendedMaxCapacity: 5800,
+      currentOccupancy: 0,
+      remainingCapacity: 5800,
       bottleneckResource: 'Healthcare substation expansion'
     },
     allocatedPopulation: 0,

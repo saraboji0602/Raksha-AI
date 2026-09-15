@@ -4,18 +4,17 @@ import {
   Shield, 
   Search, 
   Bell, 
-  Play, 
   Sparkles, 
   RefreshCw, 
   Radio, 
   Globe, 
   AlertTriangle,
   Layers,
-  FileText,
   MapPin,
   Building2,
   ChevronDown,
-  UserCheck
+  Activity,
+  PhoneCall
 } from 'lucide-react';
 import { Badge } from '../common/Badge';
 
@@ -25,23 +24,31 @@ export const TopBar: React.FC<{ onToggleSidebar?: () => void }> = ({ onToggleSid
     setSearchTerm,
     settlements,
     safeSites,
+    selectedSettlementId,
     setSelectedSettlementId,
     setSelectedSafeSiteId,
     setCurrentPage,
     alerts,
+    activeViewMode,
+    setActiveViewMode,
+    incidents,
     emergencyMode,
     setEmergencyMode,
     language,
     setLanguage,
     t,
     startDemoTour,
-    triggerSimulatedDataUpdate,
+    kadalpuramSimulationMode,
+    toggleRisingRiverSimulation,
     setIsAIChatOpen,
     currentUser,
     filterDistrict,
     setFilterDistrict,
-    addToast
+    addToast,
+    setIsDecisionBriefOpen,
+    resetToDemoBaseline
   } = useApp();
+
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -99,6 +106,29 @@ export const TopBar: React.FC<{ onToggleSidebar?: () => void }> = ({ onToggleSid
 
   return (
     <header className="bg-slate-900/95 border-b border-slate-800 text-slate-100 sticky top-0 z-30 backdrop-blur-md">
+      {/* Top Banner: Product Pipeline Ribbon */}
+      <div className="hidden lg:flex items-center justify-between px-4 py-1 bg-slate-950 border-b border-slate-800/80 text-[10px] font-mono text-slate-400 select-none">
+        <div className="flex items-center gap-2">
+          <span className="text-cyan-400 font-bold">PIPELINE:</span>
+          <span className="text-slate-300">
+            DETECT <span className="text-cyan-500">→</span> UNDERSTAND <span className="text-cyan-500">→</span> WARN <span className="text-cyan-500">→</span> ACT <span className="text-cyan-500">→</span> VERIFY <span className="text-cyan-500">→</span> RESPOND <span className="text-cyan-500">→</span> RECOVER <span className="text-cyan-500">→</span> RELOCATE <span className="text-cyan-500">→</span> PREVENT
+          </span>
+        </div>
+
+        <div className="flex items-center gap-4 text-slate-400">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Deterministic Engine: <strong className="text-white">Active</strong></span>
+          </span>
+          <span>•</span>
+          <span>Data: <strong className="text-cyan-400">Synthetic Sensor Feed</strong></span>
+          <span>•</span>
+          <span className="text-slate-400">
+            "Understand the risk. Prioritize the people. Find the safer option. Act with evidence."
+          </span>
+        </div>
+      </div>
+
       <div className="flex items-center justify-between px-3 sm:px-5 py-2.5 gap-2 sm:gap-4">
         {/* Left Brand / Logo */}
         <div className="flex items-center gap-3">
@@ -123,15 +153,39 @@ export const TopBar: React.FC<{ onToggleSidebar?: () => void }> = ({ onToggleSid
                 <span className="font-extrabold text-base tracking-wider bg-gradient-to-r from-white via-slate-100 to-cyan-300 bg-clip-text text-transparent font-mono">
                   RAKSHA-AI
                 </span>
-                <span className="hidden sm:inline-block text-[10px] font-mono font-bold bg-cyan-950/80 text-cyan-400 px-1.5 py-0.5 rounded border border-cyan-700/50 uppercase">
-                  DEMO DATA
+                <span className="text-[10px] font-mono font-bold bg-cyan-950/90 text-cyan-400 px-1.5 py-0.5 rounded border border-cyan-700/50 uppercase">
+                  DEMO / SYNTHETIC DATA
                 </span>
               </div>
               <span className="hidden md:inline-block text-[10px] text-slate-400 font-medium tracking-tight">
-                Disaster Red-Zone Detection & Intelligent Relocation Engine
+                From Hazard Detection to Safe Relocation Decisions
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Habitation Selector Quick Switcher */}
+        <div className="hidden xl:flex items-center gap-1.5 bg-slate-950 border border-slate-700/80 rounded-xl px-2.5 py-1 text-xs">
+          <Building2 className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="text-slate-400 font-semibold">Active Settlement:</span>
+          <select
+            value={selectedSettlementId}
+            onChange={(e) => {
+              setSelectedSettlementId(e.target.value);
+              addToast({
+                type: 'info',
+                title: 'Settlement Switched',
+                description: `Digital Twin focused on ${e.target.options[e.target.selectedIndex].text.split(' (')[0]}.`
+              });
+            }}
+            className="bg-transparent text-white font-bold outline-none cursor-pointer text-xs"
+          >
+            {settlements.map(s => (
+              <option key={s.id} value={s.id} className="bg-slate-900 text-white">
+                {s.name} ({s.overallRisk}/100)
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Global Search Bar with Autocomplete Dropdown */}
@@ -140,7 +194,7 @@ export const TopBar: React.FC<{ onToggleSidebar?: () => void }> = ({ onToggleSid
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search settlements (e.g. Kadalpuram), sites, reports..."
+              placeholder="Search habitations (e.g. Kadalpuram), candidate havens..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -186,6 +240,86 @@ export const TopBar: React.FC<{ onToggleSidebar?: () => void }> = ({ onToggleSid
 
         {/* Action Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* View Mode Switcher: Officer vs Citizen Portal */}
+          <button
+            onClick={() => {
+              const nextMode = activeViewMode === 'OFFICER' ? 'CITIZEN' : 'OFFICER';
+              setActiveViewMode(nextMode);
+              addToast({
+                type: 'info',
+                title: nextMode === 'CITIZEN' ? 'Citizen Safety Portal Active' : 'Officer Command Center Active',
+                description: nextMode === 'CITIZEN' ? 'Citizen view for public alerts, SOS beacons, shelters, and routes.' : 'Official DDMA command operations center.'
+              });
+            }}
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-slate-950 font-black text-xs shadow-md shadow-purple-600/30 flex items-center gap-1.5 transition-all active:scale-95"
+            title="Toggle between Officer Command Portal & Citizen Safety View"
+          >
+            <span>{activeViewMode === 'OFFICER' ? '📱' : '🏛️'}</span>
+            <span className="hidden sm:inline">
+              {activeViewMode === 'OFFICER' ? 'Citizen Safety View' : 'Officer Command Portal'}
+            </span>
+          </button>
+
+          {/* Quick Officer Emergency Center Shortcut */}
+          {activeViewMode === 'OFFICER' && (
+            <button
+              onClick={() => setCurrentPage('emergency-center')}
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-700/80 text-xs font-bold transition-all"
+              title="Open Officer Emergency Center"
+            >
+              <Radio className="w-3.5 h-3.5 text-red-400 animate-pulse" />
+              <span>Emergency Center</span>
+              {incidents.filter(i => i.status !== 'RESOLVED').length > 0 && (
+                <span className="font-mono text-[9px] px-1.5 py-0.2 rounded-full bg-red-600 text-white font-black">
+                  {incidents.filter(i => i.status !== 'RESOLVED').length}
+                </span>
+              )}
+            </button>
+          )}
+
+          {/* Simulate Rising River Demo Switch */}
+          <button
+            onClick={toggleRisingRiverSimulation}
+            className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border shadow-md ${
+              kadalpuramSimulationMode === 'RISING_RIVER_SURGE'
+                ? 'bg-red-600 hover:bg-red-500 text-white border-red-400 animate-pulse'
+                : 'bg-slate-800 hover:bg-slate-750 text-cyan-300 border-slate-700'
+            }`}
+            title="Simulate river rise & dynamic red-zone expansion (Risk 72 ⇄ 91)"
+          >
+            <RefreshCw className="w-3.5 h-3.5 text-cyan-300" />
+            <span>
+              {kadalpuramSimulationMode === 'RISING_RIVER_SURGE' ? 'Surge: 91 Risk' : 'Simulate Surge: 72→91'}
+            </span>
+          </button>
+
+          {/* Decision Brief Modal Trigger */}
+          <button
+            onClick={() => setIsDecisionBriefOpen(true)}
+            className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 font-bold text-xs border border-amber-500/40 shadow-md transition-all active:scale-95"
+            title="Open Judge-Ready Executive Disaster Decision Dossier"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>{t('decisionBriefBtn') || 'Decision Brief'}</span>
+          </button>
+
+          {/* Reset Demo Button */}
+          <button
+            onClick={() => {
+              resetToDemoBaseline();
+              addToast({
+                type: 'success',
+                title: 'Demo Reset to Baseline',
+                description: 'Kadalpuram restored to Risk 72/100 baseline state.'
+              });
+            }}
+            className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition-all"
+            title="Reset simulation, conflicts, and state to clean demo baseline"
+          >
+            <RefreshCw className="w-3.5 h-3.5 text-slate-400" />
+            <span>{t('resetDemoBtn') || 'Reset Demo'}</span>
+          </button>
+
           {/* Quick Demo Tour Launch */}
           <button
             onClick={startDemoTour}
@@ -194,16 +328,6 @@ export const TopBar: React.FC<{ onToggleSidebar?: () => void }> = ({ onToggleSid
           >
             <Sparkles className="w-3.5 h-3.5 fill-slate-950" />
             <span>4-Min Demo Tour</span>
-          </button>
-
-          {/* Simulate Sensor Data Update */}
-          <button
-            onClick={triggerSimulatedDataUpdate}
-            className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs border border-slate-700 font-medium transition-colors"
-            title="Simulate Real-time Satellite InSAR sensor ingestion"
-          >
-            <RefreshCw className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Simulate InSAR</span>
           </button>
 
           {/* Emergency Operations Mode Switch */}
@@ -222,11 +346,12 @@ export const TopBar: React.FC<{ onToggleSidebar?: () => void }> = ({ onToggleSid
                 ? 'bg-red-600 text-white border-red-500 animate-pulse'
                 : 'bg-slate-800/80 hover:bg-slate-750 text-slate-300 border-slate-700'
             }`}
-            title="Toggle Emergency Mode"
+            title="Toggle Emergency Operations Mode"
           >
             <AlertTriangle className={`w-3.5 h-3.5 ${emergencyMode ? 'text-white' : 'text-red-400'}`} />
             <span className="hidden sm:inline">{emergencyMode ? 'EMERGENCY' : 'Emergency'}</span>
           </button>
+
 
           {/* Language Switcher */}
           <div className="flex items-center bg-slate-800 rounded-lg p-0.5 border border-slate-700">
@@ -325,3 +450,4 @@ export const TopBar: React.FC<{ onToggleSidebar?: () => void }> = ({ onToggleSid
     </header>
   );
 };
+

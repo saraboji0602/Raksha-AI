@@ -19,7 +19,7 @@ import {
 import { Badge } from '../common/Badge';
 
 export const ReportsHub: React.FC = () => {
-  const { settlements, getSelectedSettlement, addToast } = useApp();
+  const { settlements, getSelectedSettlement, addToast, setIsDecisionBriefOpen } = useApp();
   const [reportsList, setReportsList] = useState<GeneratedReport[]>(MockDataService.getReports());
   const [activeReportForModal, setActiveReportForModal] = useState<GeneratedReport | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -97,7 +97,15 @@ export const ReportsHub: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 self-end sm:self-center flex-shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 self-end sm:self-center flex-shrink-0">
+          <button
+            onClick={() => setIsDecisionBriefOpen(true)}
+            className="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 text-xs font-bold border border-amber-500/40 flex items-center gap-1.5 transition-all shadow-md"
+          >
+            <Sparkles className="w-4 h-4 text-amber-300" />
+            <span>Executive Decision Brief</span>
+          </button>
+
           <button
             onClick={handleExportCSV}
             className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 flex items-center gap-1.5 transition-colors"

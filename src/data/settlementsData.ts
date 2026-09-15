@@ -15,28 +15,137 @@ export const INITIAL_SETTLEMENTS: Settlement[] = [
     settlementType: 'COASTAL',
     isUrban: false,
     
-    overallRisk: 91,
+    overallRisk: 72,
+    baselineRisk: 72,
     exposureScore: 88,
     vulnerabilityScore: 84,
     resilienceScore: 48,
     dataConfidence: 93,
     
     priority: 'IMMEDIATE',
+    emergencyUrgency: 'IMMEDIATE',
+    longTermPriority: 'HIGH',
     priorityScore: 94,
     aiRecommendation: 'PARTIAL_RELOCATION',
-    recommendationReason: 'Extreme coastal erosion affects the northern micro-zone (high wave surge & sea intrusion). In-situ mitigation is technically insufficient for Zone A. 2,650 residents require relocation to Site B while remaining southern zones can be adapted.',
+    recommendationReason: 'Extreme coastal erosion and compound storm surge risk affect northern micro-zones. 2,650 residents in Zone A require relocation to Site B while central & southern zones can be adapted with in-situ works.',
     status: 'ASSESSMENT',
+    humanReviewStatus: 'PENDING_OFFICER_REVIEW',
     
     exposedPopulation: 4210,
     exposedPercentage: 87,
     childrenCount: 620,
     elderlyCount: 410,
     specialAssistanceCount: 185,
+    femaleHeadedCount: 160,
+    kutchaHouseCount: 510,
     
     relocationPopulation: 2650,
     adaptationPopulation: 1220,
     protectionPopulation: 950,
     recommendedSiteId: 'site-b',
+
+    compoundHazard: {
+      type: 'CYCLONE_PLUS_COASTAL_EROSION',
+      primaryHazard: 'coastal_erosion',
+      secondaryHazard: 'cyclone',
+      interactionMultiplier: 1.32,
+      explanation: 'Active shoreline scarp retreat reduces natural dune elevation, allowing cyclonic high-tide surge waves to penetrate 600m deeper inland.'
+    },
+
+    dataConfidenceRecords: [
+      {
+        sourceName: 'Synthetic Satellite InSAR Coastal Deformation Grid',
+        sourceType: 'SYNTHETIC_SATELLITE',
+        timestamp: '2026-09-15 08:30',
+        freshnessMinutes: 12,
+        confidenceScore: 95,
+        status: 'CONFIRMED',
+        isDemoSynthetic: true
+      },
+      {
+        sourceName: 'Synthetic Regional Met-Ocean Storm Surge Vector',
+        sourceType: 'SYNTHETIC_MET_GRID',
+        timestamp: '2026-09-15 09:00',
+        freshnessMinutes: 8,
+        confidenceScore: 92,
+        status: 'CONFIRMED',
+        isDemoSynthetic: true
+      },
+      {
+        sourceName: 'Basin Hydrological 5m Digital Elevation Model',
+        sourceType: 'DEM_BASIN',
+        timestamp: '2026-08-28 14:00',
+        freshnessMinutes: 1440,
+        confidenceScore: 89,
+        status: 'CONFIRMED',
+        isDemoSynthetic: true
+      },
+      {
+        sourceName: 'Ground Truth DDMA Field Officer Verification Audit',
+        sourceType: 'FIELD_VERIFICATION',
+        timestamp: '2026-09-08 11:30',
+        freshnessMinutes: 720,
+        confidenceScore: 94,
+        status: 'CONFIRMED',
+        isDemoSynthetic: true
+      }
+    ],
+
+    whoNeedsAction: [
+      {
+        id: 'act-kz-01',
+        zoneId: 'kz-1',
+        zoneName: 'North Fisherman Spit (Zone A)',
+        actionType: 'PARTIAL_RELOCATION',
+        urgency: 'IMMEDIATE',
+        affectedPopulation: 2650,
+        affectedHouseholds: 510,
+        vulnerableBreakdown: {
+          children: 340,
+          elderly: 220,
+          specialAssistance: 110,
+          femaleHeaded: 95
+        },
+        housingType: 'KUTCHA_THATCHED',
+        targetDestinationSiteId: 'site-b',
+        targetDestinationName: 'Site B (Pothigai Haven)',
+        actionRationale: 'Direct wave attack corridor within 50m of High Tide Line. 3.4m/year scarp regression makes structural protection technically unviable.'
+      },
+      {
+        id: 'act-kz-02',
+        zoneId: 'kz-2',
+        zoneName: 'Central Panchayat Market (Zone B)',
+        actionType: 'ADAPT',
+        urgency: 'SHORT_TERM',
+        affectedPopulation: 1220,
+        affectedHouseholds: 232,
+        vulnerableBreakdown: {
+          children: 170,
+          elderly: 110,
+          specialAssistance: 45,
+          femaleHeaded: 40
+        },
+        housingType: 'SEMI_PUCCA',
+        actionRationale: 'Elevated 3.5m MSL terrain. In-situ plinth elevation, stormwater sluice gates, and roof anchoring mitigate over 60% of cyclonic surge damage.'
+      },
+      {
+        id: 'act-kz-03',
+        zoneId: 'kz-3',
+        zoneName: 'Southern Inland Hamlet (Zone C)',
+        actionType: 'PROTECT',
+        urgency: 'MEDIUM_TERM',
+        affectedPopulation: 950,
+        affectedHouseholds: 170,
+        vulnerableBreakdown: {
+          children: 110,
+          elderly: 80,
+          specialAssistance: 30,
+          femaleHeaded: 25
+        },
+        housingType: 'PUCCA_VULNERABLE',
+        actionRationale: 'Naturally buffered behind dense mangrove bio-shield. Tidal bund reinforcement and early warning maintenance provides comprehensive defense.'
+      }
+    ],
     
     costProtectCr: 12.0,
     costAdaptCr: 19.0,
@@ -48,7 +157,7 @@ export const INITIAL_SETTLEMENTS: Settlement[] = [
     secondaryEvacRoute: 'Coastal Canal Causeway Route (Submerged during high tide)',
     evacBottleneck: 'Bridge B-07 (Over-capacity & flood exposure during cyclonic surge)',
     
-    lastUpdated: '2026-09-08 11:30 AM',
+    lastUpdated: '2026-09-15 09:30 AM',
     fieldVerified: true,
     fieldVerificationNotes: 'Field officer verified active 1.8m coastal scarp erosion and water table salinity in Northern Habitation cluster.',
     verifiedBy: 'Insp. R. Sundaram (DDMA Field Team 4)',
@@ -123,7 +232,10 @@ export const INITIAL_SETTLEMENTS: Settlement[] = [
           [10.775, 79.845],
           [10.768, 79.848],
           [10.765, 79.842]
-        ]
+        ],
+        vulnerablePeopleCount: 670,
+        kutchaHousesCount: 510,
+        distanceToCoastlineMeters: 45
       },
       {
         id: 'kz-2',
@@ -141,7 +253,10 @@ export const INITIAL_SETTLEMENTS: Settlement[] = [
           [10.768, 79.842],
           [10.762, 79.844],
           [10.760, 79.839]
-        ]
+        ],
+        vulnerablePeopleCount: 325,
+        kutchaHousesCount: 140,
+        distanceToCoastlineMeters: 380
       },
       {
         id: 'kz-3',
@@ -159,14 +274,17 @@ export const INITIAL_SETTLEMENTS: Settlement[] = [
           [10.761, 79.839],
           [10.755, 79.841],
           [10.752, 79.837]
-        ]
+        ],
+        vulnerablePeopleCount: 220,
+        kutchaHousesCount: 45,
+        distanceToCoastlineMeters: 850
       }
     ],
     
     infrastructure: {
       schools: { count: 3, exposed: 2, nearestKm: 0.4 },
       healthcare: { count: 1, exposed: 1, nearestKm: 1.2, facilityType: 'Primary Health Sub-centre' },
-      waterSupply: { score: 38, reliability: 'LOW', nearestKm: 2.1 },
+      waterSupply: { score: 38, reliability: 'LOW', nearestKm: 2.1, sourceNote: 'Local groundwater saline intrusion observed' },
       roads: { accessScore: 42, primaryRouteBlocked: false, bottleneckNotes: 'Bridge B-07 flood prone; single lane exit road R-12', nearestHighwayKm: 6.4 },
       emergencyShelters: { count: 1, capacity: 450, nearestKm: 0.9 },
       powerReliability: 54,
@@ -232,42 +350,54 @@ export const INITIAL_SETTLEMENTS: Settlement[] = [
         contribution: 24,
         category: 'HAZARD',
         description: 'Zone A scarp within 50m of active wave front with 3.4m/yr coastal retreat.',
-        isCritical: true
+        isCritical: true,
+        dataSource: 'Synthetic Satellite InSAR + Gauge telemetry',
+        confidencePct: 95
       },
       {
         factor: 'High Density Population in Inundation Envelope',
         contribution: 19,
         category: 'EXPOSURE',
         description: '2,650 residents reside below 2.0m contour line with high exposure risk.',
-        isCritical: true
+        isCritical: true,
+        dataSource: 'Synthetic Census Demographic Survey',
+        confidencePct: 94
       },
       {
         factor: 'Repeated Historical Cyclone & Surge Flooding',
         contribution: 17,
         category: 'HAZARD',
         description: '4 major flooding & surge events in past 8 years causing cumulative damage.',
-        isCritical: true
+        isCritical: true,
+        dataSource: 'State Disaster Archive Logs',
+        confidencePct: 98
       },
       {
         factor: 'Evacuation Route Fragility (Bridge B-07)',
         contribution: 13,
         category: 'RESILIENCE',
         description: 'Single outbound bridge B-07 submerses at +1.2m surge, trapping northern sector.',
-        isCritical: false
+        isCritical: false,
+        dataSource: 'PWD Road Infrastructure Survey',
+        confidencePct: 91
       },
       {
         factor: 'Sub-centre Health Facility in Red Zone',
         contribution: 9,
         category: 'VULNERABILITY',
         description: 'Sole PHC sub-centre is inside tidal surge zone, crippling first response.',
-        isCritical: false
+        isCritical: false,
+        dataSource: 'District Health Registry',
+        confidencePct: 88
       },
       {
         factor: 'Housing Fragility (Kutcha / Semi-Pucca %)',
         contribution: 8,
         category: 'VULNERABILITY',
         description: '64% structures have tin/thatch roofs prone to high wind shearing.',
-        isCritical: false
+        isCritical: false,
+        dataSource: 'Field Verification Audit (Verified)',
+        confidencePct: 95
       }
     ]
   },

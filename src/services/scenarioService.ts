@@ -7,6 +7,7 @@ export class ScenarioService {
   static generateScenarios(settlement: Settlement): ScenarioImpact[] {
     const pop = settlement.population;
     const isKadalpuram = settlement.id === 'kadalpuram';
+    const inaction = settlement.costOfInactionCr;
 
     return [
       {
@@ -18,14 +19,14 @@ export class ScenarioService {
         residualRiskLevel: 'CRITICAL',
         populationProtectedOrRelocated: 0,
         exposedPopulationRemaining: settlement.exposedPopulation,
-        infrastructureExposureRemainingCr: settlement.costOfInactionCr,
+        infrastructureExposureRemainingCr: inaction,
         implementationYears: 0,
         socialDisruptionLevel: 'VERY_LOW',
-        costOfInactionCr: settlement.costOfInactionCr,
-        netBenefitCr: -settlement.costOfInactionCr,
+        costOfInactionCr: inaction,
+        netBenefitCr: -inaction,
         isAIRecommended: false,
-        description: 'Risk remains unmanaged and shoreline regression/slope shear accelerates. Cumulative disaster response and reconstruction will cost ₹' + settlement.costOfInactionCr + ' Cr over 10 years.',
-        keyMitigations: ['Emergency post-disaster relief only', 'No structural risk reduction']
+        description: `Risk remains unmanaged. Cumulative disaster response, emergency relief, and reconstruction will cost ₹${inaction} Cr over 10 years with recurrent human displacement.`,
+        keyMitigations: ['Emergency post-disaster relief only', 'No structural risk reduction', 'Zero resilience gain']
       },
       {
         type: 'PROTECT',
@@ -36,13 +37,13 @@ export class ScenarioService {
         residualRiskLevel: 'HIGH',
         populationProtectedOrRelocated: isKadalpuram ? 2900 : Math.round(pop * 0.6),
         exposedPopulationRemaining: isKadalpuram ? 1920 : Math.round(pop * 0.4),
-        infrastructureExposureRemainingCr: Math.round(settlement.costOfInactionCr * 0.65),
+        infrastructureExposureRemainingCr: Math.round(inaction * 0.65),
         implementationYears: 2,
-        socialDisruptionLevel: 'VERY_LOW',
-        costOfInactionCr: Math.round(settlement.costOfInactionCr * 0.76),
-        netBenefitCr: Math.round(settlement.costOfInactionCr * 0.24 - settlement.costProtectCr),
+        socialDisruptionLevel: 'LOW',
+        costOfInactionCr: Math.round(inaction * 0.76),
+        netBenefitCr: Math.round(inaction * 0.24 - settlement.costProtectCr),
         isAIRecommended: settlement.aiRecommendation === 'PROTECT',
-        description: 'Hard engineering seawalls, groynes, or retaining walls built on-site. High initial protection, but vulnerable to extreme Category 4 surge breach.',
+        description: 'Hard engineering seawalls, groynes, or retaining walls built on-site. Moderate short-term protection, but vulnerable to extreme Category 4 surge breach.',
         keyMitigations: ['Submerged geotube breakwaters', 'Concrete seawall reinforcement', 'Drainage sluices']
       },
       {
@@ -54,36 +55,78 @@ export class ScenarioService {
         residualRiskLevel: 'MODERATE',
         populationProtectedOrRelocated: isKadalpuram ? 3700 : Math.round(pop * 0.8),
         exposedPopulationRemaining: isKadalpuram ? 1120 : Math.round(pop * 0.2),
-        infrastructureExposureRemainingCr: Math.round(settlement.costOfInactionCr * 0.45),
+        infrastructureExposureRemainingCr: Math.round(inaction * 0.45),
         implementationYears: 3,
         socialDisruptionLevel: 'LOW',
-        costOfInactionCr: Math.round(settlement.costOfInactionCr * 0.59),
-        netBenefitCr: Math.round(settlement.costOfInactionCr * 0.41 - settlement.costAdaptCr),
+        costOfInactionCr: Math.round(inaction * 0.59),
+        netBenefitCr: Math.round(inaction * 0.41 - settlement.costAdaptCr),
         isAIRecommended: settlement.aiRecommendation === 'ADAPT',
         description: 'Nature-based coastal mangrove bio-shields combined with raised plinth stilt construction and storm-resistant community shelters.',
         keyMitigations: ['Mangrove bio-shield buffer', 'Raised plinth housing upgrades', 'High-capacity stormwater pumps']
       },
       {
-        type: settlement.aiRecommendation === 'PARTIAL_RELOCATION' ? 'PARTIAL_RELOCATION' : 'FULL_RELOCATION',
-        name: settlement.aiRecommendation === 'PARTIAL_RELOCATION' ? 'Intelligent Partial Relocation' : 'Full Planned Relocation',
+        type: 'PARTIAL_RELOCATION',
+        name: 'Intelligent Partial Relocation',
         investmentCr: settlement.costRelocateCr,
-        riskReductionPct: settlement.aiRecommendation === 'PARTIAL_RELOCATION' ? 76 : 91,
-        residualRisk: settlement.aiRecommendation === 'PARTIAL_RELOCATION' ? 22 : 9,
+        riskReductionPct: 76,
+        residualRisk: 22,
         residualRiskLevel: 'LOW',
-        populationProtectedOrRelocated: settlement.relocationPopulation || settlement.population,
-        exposedPopulationRemaining: Math.max(0, settlement.population - (settlement.relocationPopulation || settlement.population)),
+        populationProtectedOrRelocated: settlement.relocationPopulation || 2650,
+        exposedPopulationRemaining: Math.max(0, settlement.population - (settlement.relocationPopulation || 2650)),
         infrastructureExposureRemainingCr: 6.0,
         implementationYears: 4,
-        socialDisruptionLevel: settlement.aiRecommendation === 'PARTIAL_RELOCATION' ? 'MEDIUM' : 'HIGH',
+        socialDisruptionLevel: 'MEDIUM',
         costOfInactionCr: 12.0,
-        netBenefitCr: Math.round(settlement.costOfInactionCr * 0.76 - settlement.costRelocateCr),
-        isAIRecommended: true,
-        description: settlement.aiRecommendation === 'PARTIAL_RELOCATION'
-          ? 'Relocate 2,650 residents in critical red micro-zones to Site B while adapting remaining southern zones. Minimizes social upheaval while neutralizing life-safety risk.'
-          : 'Complete phased resettlement of 2,140 residents to geologically secure haven Site C.',
+        netBenefitCr: Math.round(inaction * 0.76 - settlement.costRelocateCr),
+        isAIRecommended: settlement.aiRecommendation === 'PARTIAL_RELOCATION',
+        description: 'Relocate high-vulnerability front-line micro-zones to Safe Site B while adapting inner habitations. Minimizes community disruption while neutralizing life-safety risk.',
         keyMitigations: ['New disaster-resilient housing township at Safe Site', 'Livelihood transit corridor', 'De-risked land use transformation']
+      },
+      {
+        type: 'FULL_RELOCATION',
+        name: 'Full Planned Resettlement',
+        investmentCr: Math.round(settlement.costRelocateCr * 1.55),
+        riskReductionPct: 92,
+        residualRisk: 8,
+        residualRiskLevel: 'LOW',
+        populationProtectedOrRelocated: settlement.population,
+        exposedPopulationRemaining: 0,
+        infrastructureExposureRemainingCr: 1.5,
+        implementationYears: 5,
+        socialDisruptionLevel: 'HIGH',
+        costOfInactionCr: 4.0,
+        netBenefitCr: Math.round(inaction * 0.92 - Math.round(settlement.costRelocateCr * 1.55)),
+        isAIRecommended: settlement.aiRecommendation === 'FULL_RELOCATION',
+        description: 'Complete phased resettlement of entire population to geologically secure haven. Eliminates all primary hazard exposure with comprehensive civil rebuild.',
+        keyMitigations: ['Full new master-planned township', 'Complete civic amenities & utilities', 'Total zone restoration & buffer creation']
       }
     ];
+  }
+
+  /**
+   * Generates 10-year cumulative disaster damage trajectory across policies
+   */
+  static getTenYearTrajectory(settlement: Settlement) {
+    const baseAnnual = settlement.costOfInactionCr / 10;
+    const years = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    return years.map(yr => {
+      // Compounding disaster cost curves
+      const doNothing = Math.round(baseAnnual * yr * (1 + 0.04 * yr));
+      const protect = Math.round((settlement.costProtectCr) + (baseAnnual * 0.65 * yr));
+      const adapt = Math.round((settlement.costAdaptCr) + (baseAnnual * 0.45 * yr));
+      const partialReloc = Math.round((settlement.costRelocateCr) + (baseAnnual * 0.18 * yr));
+      const fullReloc = Math.round((settlement.costRelocateCr * 1.55) + (baseAnnual * 0.05 * yr));
+
+      return {
+        year: `Yr ${yr}`,
+        'Do Nothing': doNothing,
+        'Protect': protect,
+        'Adapt': adapt,
+        'Partial Relocation': partialReloc,
+        'Full Relocation': fullReloc
+      };
+    });
   }
 
   /**

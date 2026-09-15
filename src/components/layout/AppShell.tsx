@@ -24,11 +24,29 @@ import { AlertsPage } from '../../pages/AlertsPage';
 import { DataSourcesPage } from '../../pages/DataSourcesPage';
 import { SettingsPage } from '../../pages/SettingsPage';
 import { HelpPage } from '../../pages/HelpPage';
+import { OfficerEmergencyCenterPage } from '../../pages/OfficerEmergencyCenterPage';
+import { RecoveryCenterPage } from '../../pages/RecoveryCenterPage';
+import { AuditTrailView } from '../audit/AuditTrailView';
+import { PreventionPage } from '../../pages/PreventionPage';
+import { DecisionBriefModal } from '../reports/DecisionBriefModal';
+import { DataConflictBanner } from '../conflict/DataConflictBanner';
+import { DataConflictResolutionModal } from '../conflict/DataConflictResolutionModal';
+import { CitizenPortal } from '../citizen/CitizenPortal';
 
 export const AppShell: React.FC = () => {
-  const { currentPage } = useApp();
+  const { currentPage, activeViewMode } = useApp();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+
+  // If in Citizen Safety Mode, render the dedicated Citizen Portal experience
+  if (activeViewMode === 'CITIZEN') {
+    return (
+      <>
+        <ToastContainer />
+        <CitizenPortal />
+      </>
+    );
+  }
 
   const renderCurrentPage = () => {
     switch (currentPage) {
@@ -48,6 +66,14 @@ export const AppShell: React.FC = () => {
         return <RelocationPlannerPage />;
       case 'simulator':
         return <SimulatorPage />;
+      case 'prevention':
+        return <PreventionPage />;
+      case 'emergency-center':
+        return <OfficerEmergencyCenterPage />;
+      case 'recovery':
+        return <RecoveryCenterPage />;
+      case 'audit':
+        return <AuditTrailView />;
       case 'field-verification':
         return <FieldVerificationPage />;
       case 'reports':
@@ -72,6 +98,9 @@ export const AppShell: React.FC = () => {
 
       {/* Emergency Alert Banner (when active) */}
       <EmergencyBanner />
+
+      {/* Top Data Conflict Detection Banner (when active) */}
+      <DataConflictBanner />
 
       {/* Top Guided Hackathon Tour Banner (when active) */}
       <GuidedTourBanner />
@@ -111,8 +140,14 @@ export const AppShell: React.FC = () => {
         </div>
       </div>
 
+      {/* Data Conflict Arbiter Modal */}
+      <DataConflictResolutionModal />
+
       {/* Universal Decision Trace Modal */}
       <DecisionTraceModal />
+
+      {/* Judge-Ready Executive Decision Brief Modal */}
+      <DecisionBriefModal />
 
       {/* First-time Onboarding Modal */}
       <OnboardingModal
@@ -125,3 +160,4 @@ export const AppShell: React.FC = () => {
     </div>
   );
 };
+
